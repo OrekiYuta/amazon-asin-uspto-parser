@@ -1,6 +1,7 @@
-# Amazon-asin-parser
+# Amazon-asin-uspto-parser
 
-- Amazon-asin-parser is a desktop app useful for parser data from amazon each country site using ASIN.
+
+- Amazon-asin-uspto-parser is a desktop app useful for parser data from amazon each country site using ASIN.
 - Also, can check the registration of brand trademarks.
 
 ## Requirements

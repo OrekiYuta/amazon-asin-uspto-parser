@@ -1,4 +1,4 @@
-# amazon-asin-parser
+# Amazon-asin-parser
 
 - Amazon-asin-parser is a desktop app useful for parser data from amazon each country site using ASIN.
 - Also, can check the registration of brand trademarks.

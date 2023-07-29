@@ -15,6 +15,7 @@ pip install -r requirements.txt
 ```shell
 chromedriver_autoinstaller==0.6.2
 selenium==4.5.0
+flet==0.7.4
 
 ```
 

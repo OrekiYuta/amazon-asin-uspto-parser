@@ -14,22 +14,39 @@ import parser_common
 def fetch_uspto_common(brand, driver, uspto_check_url):
     is_registered_flag = False
 
-    europe_url = "https://www.tmdn.org/tmview/#/tmview/results?page=1&pageSize=30&criteria=C&offices=AT,BG,BX,CY,CZ," \
-                 "DE,DK,EE,ES,FI,FR,GR,HR,HU,IE,IT,LT,LV,MT,PL,PT,RO,SE,SI,SK,EM,WO&territories=EU&basicSearch=n01n02 "
-
-    uspto_check_url = europe_url
+    # europe_url = "https://www.tmdn.org/tmview/#/tmview/results?page=1&pageSize=30&criteria=C&offices=AT,BG,BX,CY,CZ,DE,DK,EE,ES,FI,FR,GR,HR,HU,IE,IT,LT,LV,MT,PL,PT,RO,SE,SI,SK,EM,WO&territories=EU&basicSearch=NELAHSHA"
+    # uspto_check_url = europe_url
 
     retries = 0
     max_retries = 3
     while retries < max_retries:
         try:
             driver.get(uspto_check_url)
+            # time.sleep(3)
+            # driver.get(europe_url)
 
-            time.sleep(3)
+            driver.implicitly_wait(10)
+
+            area_select = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, '/html/body/div[1]/div/div[3]/div/div/div/div[1]/div/div/div[2]/form/div[3]/div/div[2]/div[1]/div/div/div/span/i')
+                )
+            )
+
+            area_select.click()
+            #
+            # area_button = WebDriverWait(driver, 10).until(
+            #     EC.element_to_be_clickable(
+            #         (By.XPATH, '/html/body/div[1]/div/div[3]/div/div/div/div[1]/div/div/div[2]/form/div[3]/div/div[2]/div[1]/div/div/div/span/i')
+            #     )
+            # )
+            #
+            # area_button.click()
 
             search_input = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[3]/div/div[1]/div[1]/div/div/div['
                                                          '2]/div[1]/form/div/div/div/fieldset/div[2]/div/div/div['
                                                          '2]/div[1]/div/div[1]/input[1]')
+            search_input.clear()
             search_input.send_keys(brand)
 
             search_button = WebDriverWait(driver, 10).until(
@@ -62,7 +79,9 @@ def fetch_uspto_common(brand, driver, uspto_check_url):
         flag_element = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[3]/div/div[2]/div/div[2]/div["
                                                      "1]/div/div/div[1]/div[2]")
 
-        if any(substring not in flag_element.text.strip() for substring in {"没有", "No"}):
+        if "没有" not in flag_element.text.strip():
+            is_registered_flag = True
+        if "No" not in flag_element.text.strip():
             is_registered_flag = True
 
     except NoSuchElementException:

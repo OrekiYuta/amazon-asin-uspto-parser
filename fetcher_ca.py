@@ -11,7 +11,7 @@ import logging
 import parser_common
 
 
-def fetch_uspto__ca(brand, driver, uspto_check_url):
+def fetch_uspto_ca(brand, driver, uspto_check_url):
     is_registered_flag = False
 
     retries = 0
@@ -20,14 +20,17 @@ def fetch_uspto__ca(brand, driver, uspto_check_url):
         try:
             driver.get(uspto_check_url)
 
-            time.sleep(2)
+            driver.implicitly_wait(10)
 
-            search_input = driver.find_element(By.ID, 'wb-auto-17')
+            search_input = driver.find_element(By.XPATH,
+                                               "/html/body/main/div[3]/div[2]/div/details[1]/div/form/div[1]/div["
+                                               "2]/div/div[2]/div/div/input")
+            search_input.clear()
             search_input.send_keys(brand)
 
             search_button = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable(
-                    (By.ID, 'wb-auto-18')
+                    (By.XPATH, "/html/body/main/div[3]/div[2]/div/details[1]/div/form/div[3]/div/div/button[1]")
                 )
             )
 

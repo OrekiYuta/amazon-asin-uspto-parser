@@ -20,10 +20,11 @@ def fetch_uspto_co_jp(brand, driver, uspto_check_url):
         try:
             driver.get(uspto_check_url)
 
-            time.sleep(2)
+            driver.implicitly_wait(10)
 
             # 输入商标
             search_input = driver.find_element(By.ID, 's01_srchCondtn_txtSimpleSearch')
+            search_input.clear()
             search_input.send_keys(brand)
 
             # 点击查询按钮

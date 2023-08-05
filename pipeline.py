@@ -35,7 +35,7 @@ chromedriver_autoinstaller.install(cwd=True)
 chrome_options = Options()
 
 # chrome_options.add_argument('--headless')  # 无头模式,不打开浏览器窗口
-chrome_options.add_argument("start-maximized")
+# chrome_options.add_argument("start-maximized")
 chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 chrome_options.add_experimental_option('useAutomationExtension', False)
@@ -208,5 +208,5 @@ def pipeline():
 
 
 if __name__ == '__main__':
-    pipeline()
-    # get_uspto_info()
+    # pipeline()
+    get_uspto_info()

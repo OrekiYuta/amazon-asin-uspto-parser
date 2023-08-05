@@ -20,9 +20,10 @@ def fetch_uspto_co_uk(brand, driver, uspto_check_url):
         try:
             driver.get(uspto_check_url)
 
-            time.sleep(2)
+            driver.implicitly_wait(10)
 
             search_input = driver.find_element(By.XPATH, '/html/body/main/form/div[2]/div[4]/input')
+            search_input.clear()
             search_input.send_keys(brand)
 
             search_button = WebDriverWait(driver, 10).until(

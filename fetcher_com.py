@@ -33,6 +33,7 @@ def fetch_uspto_com(brand, driver, uspto_check_url):
 
             # 输入商标
             search_input = driver.find_element(By.XPATH, '/html/body/form/font/table[4]/tbody/tr[1]/td/input')
+            search_input.clear()
             search_input.send_keys(brand)
 
             # 点击查询按钮

@@ -48,7 +48,7 @@ def get_uspto_checker_route(country):
         '美国': fetcher_com.fetch_uspto_com,
 
         '日本': fetcher_co_jp.fetch_uspto_co_jp,
-        '加拿大': fetcher_ca.fetch_uspto__ca
+        '加拿大': fetcher_ca.fetch_uspto_ca
     }
 
     get_uspto_checker = uspto_checker.get(country)

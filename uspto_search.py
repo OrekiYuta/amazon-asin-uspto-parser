@@ -14,12 +14,53 @@ import openpyxl
 import os
 import glob
 
+import fetcher_ca
+import fetcher_co_jp
+import fetcher_co_uk
+import fetcher_com
+import fetcher_common
 import parser_common
 
 
-def collect_uspto(unique_brands, chrome_service, chrome_options):
+def get_uspto_check_urls(country):
+    uspto_check_urls = {
+        '意大利': 'https://www.tmdn.org/tmview/#/tmview',
+        '西班牙': 'https://www.tmdn.org/tmview/#/tmview',
+        '德国': 'https://www.tmdn.org/tmview/#/tmview',
+        '法国': 'https://www.tmdn.org/tmview/#/tmview',
+
+        '英国': 'https://trademarks.ipo.gov.uk/ipo-tmtext',
+        '美国': 'https://tmsearch.uspto.gov/',
+        '日本': 'https://www.j-platpat.inpit.go.jp/',
+        '加拿大': 'https://ised-isde.canada.ca/cipo/trademark-search/srch'
+    }
+    return uspto_check_urls.get(country, '')
+
+
+def get_uspto_checker_route(country):
+    uspto_checker = {
+        '意大利': fetcher_common.fetch_uspto_common,
+        '西班牙': fetcher_common.fetch_uspto_common,
+        '德国': fetcher_common.fetch_uspto_common,
+        '法国': fetcher_common.fetch_uspto_common,
+
+        '英国': fetcher_co_uk.fetch_uspto_co_uk,
+        '美国': fetcher_com.fetch_uspto_com,
+
+        '日本': fetcher_co_jp.fetch_uspto_co_jp,
+        '加拿大': fetcher_ca.fetch_uspto__ca
+    }
+
+    get_uspto_checker = uspto_checker.get(country)
+    return get_uspto_checker
+
+
+def collect_uspto(unique_brands, chrome_service, chrome_options, country_name):
     is_registered_result_dict = {}
 
+    uspto_check_url = get_uspto_check_urls(country_name)
+
+    logging.info(f'开始 {country_name} 品牌 ({uspto_check_url})')
     for i in range(0, len(unique_brands), 3):
 
         user_agent = config.get_user_agents()
@@ -48,7 +89,10 @@ def collect_uspto(unique_brands, chrome_service, chrome_options):
                 is_registered_value = "N/A"
             else:
                 logging.info(f'{current_brand} 开始查询')
-                is_registered = fetch_uspto(current_brand, driver)
+
+                # is_registered = fetch_uspto_com(current_brand, driver, uspto_check_url)
+                uspto_checker_route = get_uspto_checker_route(country_name)
+                is_registered = uspto_checker_route(current_brand, driver, uspto_check_url)
 
                 if is_registered:
                     is_registered_value = "已注册"
@@ -62,17 +106,18 @@ def collect_uspto(unique_brands, chrome_service, chrome_options):
         # 关闭当前批次的 driver 实例
         driver.quit()
 
+    logging.info(f'完成 {country_name} 品牌 ({uspto_check_url})')
     return is_registered_result_dict
 
 
-def fetch_uspto(brand, driver):
+def fetch_uspto_com(brand, driver, uspto_check_url):
     is_registered_flag = False
 
     retries = 0
     max_retries = 3
     while retries < max_retries:
         try:
-            driver.get('https://tmsearch.uspto.gov/')
+            driver.get(uspto_check_url)
 
             time.sleep(2)
             # 进入商标查询页面
@@ -131,6 +176,7 @@ def fetch_uspto(brand, driver):
 
 
 def uspto_pipeline(chrome_service, chrome_options):
+    # def uspto_pipeline():
     current_dir = os.getcwd()
     target_dir = os.path.join(current_dir, '不在售商品信息')
     excel_files = glob.glob(os.path.join(target_dir, '*.xlsx'))
@@ -139,6 +185,8 @@ def uspto_pipeline(chrome_service, chrome_options):
         file_name_with_path = excel_file.split(".xlsx")[0]
         logging.info(f'开始读取->{file_name_with_path}')
         file_name = os.path.basename(excel_file).split(".xlsx")[0]
+
+        country_name = file_name.split("_")[0]
 
         wb = openpyxl.load_workbook(excel_file)
         ws = wb.active
@@ -150,7 +198,7 @@ def uspto_pipeline(chrome_service, chrome_options):
         # 对品牌名称进行去重
         unique_brands = list(set(brand_column))
         logging.info(f'开始批量执行品牌注册查询')
-        is_registered_result_dict = collect_uspto(unique_brands, chrome_service, chrome_options)
+        is_registered_result_dict = collect_uspto(unique_brands, chrome_service, chrome_options, country_name)
         logging.info(f'完成批量执行品牌注册查询')
 
         wb.close()
@@ -185,3 +233,7 @@ def uspto_pipeline(chrome_service, chrome_options):
         output_workbook.save(output_file_path)
         output_workbook.close()
         logging.info(f'已完成 {excel_file} 中的商品注册信息查询,结果保存在 {output_file_name} 中。')
+
+
+if __name__ == '__main__':
+    uspto_pipeline()

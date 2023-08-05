@@ -194,10 +194,11 @@ def get_common_product_data_set_single_co_jp(asin, country_name, amazon_url, dri
             brand = brand_element.text.strip()
             # 'Brand: WindMax' -> 'WindMax'
             brand = parser_common.amazon_brand_split(brand)
+            brand = remove_specific_substrings(brand)
             # Marke: BITOM
-            # Marca: Compatibile
             # 品牌：Dalinch
-            # Marque: Laurier
+            # 访问 Dikeshgu 品牌旗舰店
+            # 品牌：「Hello*Enjoy 専門店」
 
         if rating_element is not None:
             rating = rating_element.text.strip()
@@ -238,3 +239,10 @@ def get_common_product_data_set_single_co_jp(asin, country_name, amazon_url, dri
     time.sleep(1)
 
     return result
+
+
+def remove_specific_substrings(text):
+    substrings_to_remove = ["品牌旗舰店", "访问", "専門店", "「", "」"]
+    for substring in substrings_to_remove:
+        text = text.replace(substring, "")
+    return text.strip()

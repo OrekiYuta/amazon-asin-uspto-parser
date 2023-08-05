@@ -65,7 +65,7 @@ def fetch_uspto_com(brand, driver, uspto_check_url):
         flag_element = driver.find_element(By.XPATH, "//form[@action='/bin/showfield']")
         target_scope = flag_element.find_element(By.XPATH, './following-sibling::*[1]')
 
-        if "Record" in target_scope.text:
+        if "Record" in target_scope.text.strip():
             is_registered_flag = True
 
     except NoSuchElementException:

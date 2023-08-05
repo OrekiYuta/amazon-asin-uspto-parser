@@ -21,24 +21,15 @@ def fetch_uspto_co_jp(brand, driver, uspto_check_url):
             driver.get(uspto_check_url)
 
             time.sleep(2)
-            # 进入商标查询页面
-            link_element = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable(
-                    (By.XPATH, '/html/body/center/table[1]/tbody/tr[2]/td/font/font/a')
-                )
-            )
-            link_element.click()
-
-            time.sleep(2)
 
             # 输入商标
-            search_input = driver.find_element(By.XPATH, '/html/body/form/font/table[4]/tbody/tr[1]/td/input')
+            search_input = driver.find_element(By.ID, 's01_srchCondtn_txtSimpleSearch')
             search_input.send_keys(brand)
 
             # 点击查询按钮
             search_button = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable(
-                    (By.XPATH, '/html/body/form/font/table[4]/tbody/tr[4]/td/input[3]')
+                    (By.ID, 's01_srchBtn_btnSearch')
                 )
             )
 
@@ -62,10 +53,9 @@ def fetch_uspto_co_jp(brand, driver, uspto_check_url):
         # parser_common.fake_operation_scroll(driver)
 
         # 检查页面元素,查找结果
-        flag_element = driver.find_element(By.XPATH, "//form[@action='/bin/showfield']")
-        target_scope = flag_element.find_element(By.XPATH, './following-sibling::*[1]')
+        flag_element = driver.find_element(By.ID, "mat-tab-label-0-2")
 
-        if "Record" in target_scope.text:
+        if "(0)" not in flag_element.text.strip():
             is_registered_flag = True
 
     except NoSuchElementException:
@@ -74,3 +64,10 @@ def fetch_uspto_co_jp(brand, driver, uspto_check_url):
         pass
 
     return is_registered_flag
+
+if __name__ == '__main__':
+    sss = "(0)"
+    if "(0)" not in sss:
+        print(2222)
+    else:
+        print(111)

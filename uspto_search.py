@@ -176,7 +176,6 @@ def fetch_uspto_com(brand, driver, uspto_check_url):
 
 
 def uspto_pipeline(chrome_service, chrome_options):
-    # def uspto_pipeline():
     current_dir = os.getcwd()
     target_dir = os.path.join(current_dir, '不在售商品信息')
     excel_files = glob.glob(os.path.join(target_dir, '*.xlsx'))

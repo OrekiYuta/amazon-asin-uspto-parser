@@ -49,9 +49,7 @@ def fetch_uspto_common(brand, driver, uspto_check_url):
             )
 
             search_button.click()
-
             time.sleep(2)
-
             break
 
         except Exception as e:

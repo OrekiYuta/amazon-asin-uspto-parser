@@ -35,7 +35,9 @@ chromedriver_autoinstaller.install(cwd=True)
 chrome_options = Options()
 
 # chrome_options.add_argument('--headless')  # 无头模式,不打开浏览器窗口
-# chrome_options.add_argument("start-maximized")
+chrome_options.add_argument("--headless=new")
+chrome_options.add_argument("start-maximized")
+chrome_options.add_argument("--window-size=1920,1080")
 chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 chrome_options.add_experimental_option('useAutomationExtension', False)

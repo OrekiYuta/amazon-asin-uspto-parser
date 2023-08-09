@@ -26,7 +26,8 @@ def get_uspto_check_urls(country):
     uspto_check_urls = {
         '意大利': 'https://www.tmdn.org/tmview/#/tmview',
         '西班牙': 'https://www.tmdn.org/tmview/#/tmview',
-        '德国': 'https://www.tmdn.org/tmview/#/tmview',
+        '德国': 'https://www.tmdn.org/tmview/#/tmview',  # 官方 https://register.dpma.de/DPMAregister/marke/basis
+
         '法国': 'https://www.tmdn.org/tmview/#/tmview',
 
         '英国': 'https://trademarks.ipo.gov.uk/ipo-tmtext',

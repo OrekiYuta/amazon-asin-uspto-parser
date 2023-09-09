@@ -8,10 +8,10 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 import logging
-import parser_common
+from parsers import parser_common
 
 
-def fetch_uspto_ca(brand, driver, uspto_check_url):
+def fetch_uspto_co_jp(brand, driver, uspto_check_url):
     is_registered_flag = False
 
     retries = 0
@@ -22,15 +22,15 @@ def fetch_uspto_ca(brand, driver, uspto_check_url):
 
             driver.implicitly_wait(10)
 
-            search_input = driver.find_element(By.XPATH,
-                                               "/html/body/main/div[3]/div[2]/div/details[1]/div/form/div[1]/div["
-                                               "2]/div/div[2]/div/div/input")
+            # 输入商标
+            search_input = driver.find_element(By.ID, 's01_srchCondtn_txtSimpleSearch')
             search_input.clear()
             search_input.send_keys(brand)
 
+            # 点击查询按钮
             search_button = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable(
-                    (By.XPATH, "/html/body/main/div[3]/div[2]/div/details[1]/div/form/div[3]/div/div/button[1]")
+                    (By.ID, 's01_srchBtn_btnSearch')
                 )
             )
 
@@ -54,9 +54,9 @@ def fetch_uspto_ca(brand, driver, uspto_check_url):
         # parser_common.fake_operation_scroll(driver)
 
         # 检查页面元素,查找结果
-        flag_element = driver.find_element(By.ID, "search-results-docs-found")
+        flag_element = driver.find_element(By.ID, "mat-tab-label-0-2")
 
-        if flag_element.text.strip() != "0":
+        if "(0)" not in flag_element.text.strip():
             is_registered_flag = True
 
     except NoSuchElementException:
@@ -65,3 +65,10 @@ def fetch_uspto_ca(brand, driver, uspto_check_url):
         pass
 
     return is_registered_flag
+
+if __name__ == '__main__':
+    sss = "(0)"
+    if "(0)" not in sss:
+        print(2222)
+    else:
+        print(111)

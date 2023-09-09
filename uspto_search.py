@@ -14,12 +14,13 @@ import openpyxl
 import os
 import glob
 
-import fetcher_ca
-import fetcher_co_jp
-import fetcher_co_uk
-import fetcher_com
-import fetcher_common
-import parser_common
+from fetcher.fetcher_ca import fetch_uspto_ca
+from fetcher.fetcher_com import fetch_uspto_com
+from fetcher.fetcher_common import fetch_uspto_common
+from fetcher.fetcher_co_jp import fetch_uspto_co_jp
+from fetcher.fetcher_co_uk import fetch_uspto_co_uk
+
+from parsers import parser_common
 
 
 def get_uspto_check_urls(country):
@@ -39,16 +40,16 @@ def get_uspto_check_urls(country):
 
 def get_uspto_checker_route(country):
     uspto_checker = {
-        '意大利': fetcher_common.fetch_uspto_common,
-        '西班牙': fetcher_common.fetch_uspto_common,
-        '德国': fetcher_common.fetch_uspto_common,
-        '法国': fetcher_common.fetch_uspto_common,
+        '意大利': fetch_uspto_common,
+        '西班牙': fetch_uspto_common,
+        '德国': fetch_uspto_common,
+        '法国': fetch_uspto_common,
 
-        '英国': fetcher_co_uk.fetch_uspto_co_uk,
-        '美国': fetcher_com.fetch_uspto_com,
+        '英国': fetch_uspto_co_uk,
+        '美国': fetch_uspto_com,
 
-        '日本': fetcher_co_jp.fetch_uspto_co_jp,
-        '加拿大': fetcher_ca.fetch_uspto_ca
+        '日本': fetch_uspto_co_jp,
+        '加拿大': fetch_uspto_ca
     }
 
     get_uspto_checker = uspto_checker.get(country)

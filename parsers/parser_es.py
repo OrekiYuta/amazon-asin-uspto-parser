@@ -7,10 +7,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-import parser_common
+import parsers.parser_common as parser_common
 
 
-def get_product_info_it(asin_list, country_name, amazon_url, postal_code, driver):
+def get_product_info_es(asin_list, country_name, amazon_url, postal_code, driver):
     retries = 0
     max_retries = 3
     fail_flag = False
@@ -79,10 +79,10 @@ def get_product_info_it(asin_list, country_name, amazon_url, postal_code, driver
     if fail_flag is True:
         return None
     else:
-        return get_common_product_data_set_multi_tabs_it(asin_list, country_name, amazon_url, driver)
+        return get_common_product_data_set_multi_tabs_es(asin_list, country_name, amazon_url, driver)
 
 
-def get_common_product_data_set_multi_tabs_it(asin_list, country_name, amazon_url, driver):
+def get_common_product_data_set_multi_tabs_es(asin_list, country_name, amazon_url, driver):
     # 创建结果集合
     results = []
     logging.info(f'开始循环打开 {country_name} 商品')
@@ -101,7 +101,7 @@ def get_common_product_data_set_multi_tabs_it(asin_list, country_name, amazon_ur
             if i + j < len(asin_list):
                 driver.switch_to.window(handles[j])
 
-                single_result = get_common_product_data_set_single_it(asin_list[i + j], country_name, amazon_url,
+                single_result = get_common_product_data_set_single_es(asin_list[i + j], country_name, amazon_url,
                                                                       driver)
 
                 if single_result is not None:
@@ -110,7 +110,7 @@ def get_common_product_data_set_multi_tabs_it(asin_list, country_name, amazon_ur
     return results
 
 
-def get_common_product_data_set_single_it(asin, country_name, amazon_url, driver):
+def get_common_product_data_set_single_es(asin, country_name, amazon_url, driver):
     # 打开商品详情链接
     product_url = f'{amazon_url}dp/{asin}'
     driver.get(product_url)

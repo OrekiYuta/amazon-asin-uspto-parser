@@ -8,10 +8,10 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 import logging
-import parser_common
+from parsers import parser_common
 
 
-def fetch_uspto_co_uk(brand, driver, uspto_check_url):
+def fetch_uspto_ca(brand, driver, uspto_check_url):
     is_registered_flag = False
 
     retries = 0
@@ -22,13 +22,15 @@ def fetch_uspto_co_uk(brand, driver, uspto_check_url):
 
             driver.implicitly_wait(10)
 
-            search_input = driver.find_element(By.XPATH, '/html/body/main/form/div[2]/div[4]/input')
+            search_input = driver.find_element(By.XPATH,
+                                               "/html/body/main/div[3]/div[2]/div/details[1]/div/form/div[1]/div["
+                                               "2]/div/div[2]/div/div/input")
             search_input.clear()
             search_input.send_keys(brand)
 
             search_button = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable(
-                    (By.ID, 'button')
+                    (By.XPATH, "/html/body/main/div[3]/div[2]/div/details[1]/div/form/div[3]/div/div/button[1]")
                 )
             )
 
@@ -52,9 +54,9 @@ def fetch_uspto_co_uk(brand, driver, uspto_check_url):
         # parser_common.fake_operation_scroll(driver)
 
         # 检查页面元素,查找结果
-        flag_element = driver.find_element(By.XPATH, "/html/body/main/form/div[1]/div/div[1]/h2")
+        flag_element = driver.find_element(By.ID, "search-results-docs-found")
 
-        if "found" in flag_element.text.strip():
+        if flag_element.text.strip() != "0":
             is_registered_flag = True
 
     except NoSuchElementException:

@@ -8,10 +8,10 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 import logging
-import parser_common
+from parsers import parser_common
 
 
-def fetch_uspto_com(brand, driver, uspto_check_url):
+def fetch_uspto_co_uk(brand, driver, uspto_check_url):
     is_registered_flag = False
 
     retries = 0
@@ -20,26 +20,15 @@ def fetch_uspto_com(brand, driver, uspto_check_url):
         try:
             driver.get(uspto_check_url)
 
-            time.sleep(2)
-            # 进入商标查询页面
-            link_element = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable(
-                    (By.XPATH, '/html/body/center/table[1]/tbody/tr[2]/td/font/font/a')
-                )
-            )
-            link_element.click()
+            driver.implicitly_wait(10)
 
-            time.sleep(2)
-
-            # 输入商标
-            search_input = driver.find_element(By.XPATH, '/html/body/form/font/table[4]/tbody/tr[1]/td/input')
+            search_input = driver.find_element(By.XPATH, '/html/body/main/form/div[2]/div[4]/input')
             search_input.clear()
             search_input.send_keys(brand)
 
-            # 点击查询按钮
             search_button = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable(
-                    (By.XPATH, '/html/body/form/font/table[4]/tbody/tr[4]/td/input[3]')
+                    (By.ID, 'button')
                 )
             )
 
@@ -63,10 +52,9 @@ def fetch_uspto_com(brand, driver, uspto_check_url):
         # parser_common.fake_operation_scroll(driver)
 
         # 检查页面元素,查找结果
-        flag_element = driver.find_element(By.XPATH, "//form[@action='/bin/showfield']")
-        target_scope = flag_element.find_element(By.XPATH, './following-sibling::*[1]')
+        flag_element = driver.find_element(By.XPATH, "/html/body/main/form/div[1]/div/div[1]/h2")
 
-        if "Record" in target_scope.text.strip():
+        if "found" in flag_element.text.strip():
             is_registered_flag = True
 
     except NoSuchElementException:

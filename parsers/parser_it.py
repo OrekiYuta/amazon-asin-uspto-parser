@@ -7,10 +7,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-import parser_common
+import parsers.parser_common as parser_common
 
 
-def get_product_info_ca(asin_list, country_name, amazon_url, postal_code, driver):
+def get_product_info_it(asin_list, country_name, amazon_url, postal_code, driver):
     retries = 0
     max_retries = 3
     fail_flag = False
@@ -25,7 +25,6 @@ def get_product_info_ca(asin_list, country_name, amazon_url, postal_code, driver
             # 如果出现验证码校验,尝试点击 "Try different image" 按钮,可能会跳过验证码校验
             captcha_jump = parser_common.captcha_jump(country_name, driver)
             if captcha_jump is False:
-                logging.info(f'验证码校验处理-失败-等待一段时间再启动')
                 fail_flag = True
                 break
 
@@ -35,7 +34,7 @@ def get_product_info_ca(asin_list, country_name, amazon_url, postal_code, driver
             logging.info(f'设置邮编-开始')
 
             try:
-                choose_location_button = WebDriverWait(driver, 30).until(
+                choose_location_button = WebDriverWait(driver, 60).until(
                     EC.element_to_be_clickable((By.ID, 'nav-global-location-popover-link'))
                 )
                 choose_location_button.click()
@@ -47,19 +46,11 @@ def get_product_info_ca(asin_list, country_name, amazon_url, postal_code, driver
                 pass
 
             parser_common.except_screenshot(driver)
-            postal_code_split = postal_code.split("-")
-
             postal_code_input = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.ID, 'GLUXZipUpdateInput_0'))
+                EC.presence_of_element_located((By.ID, 'GLUXZipUpdateInput'))
             )
             postal_code_input.clear()
-            postal_code_input.send_keys(postal_code_split[0])
-
-            postal_code_input = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.ID, 'GLUXZipUpdateInput_1'))
-            )
-            postal_code_input.clear()
-            postal_code_input.send_keys(postal_code_split[1])
+            postal_code_input.send_keys(postal_code)
 
             # 点击 Apply
             apply_button = WebDriverWait(driver, 10).until(
@@ -82,17 +73,16 @@ def get_product_info_ca(asin_list, country_name, amazon_url, postal_code, driver
             time.sleep(3)
             retries += 1
             if retries > 3:
-                fail_flag = True
-                break
+                return None
             logging.info(f'amazon 反爬虫导致未能正常采集数据,第{retries}次重试...')
 
     if fail_flag is True:
         return None
     else:
-        return get_common_product_data_set_multi_tabs_ca(asin_list, country_name, amazon_url, driver)
+        return get_common_product_data_set_multi_tabs_it(asin_list, country_name, amazon_url, driver)
 
 
-def get_common_product_data_set_multi_tabs_ca(asin_list, country_name, amazon_url, driver):
+def get_common_product_data_set_multi_tabs_it(asin_list, country_name, amazon_url, driver):
     # 创建结果集合
     results = []
     logging.info(f'开始循环打开 {country_name} 商品')
@@ -111,7 +101,7 @@ def get_common_product_data_set_multi_tabs_ca(asin_list, country_name, amazon_ur
             if i + j < len(asin_list):
                 driver.switch_to.window(handles[j])
 
-                single_result = get_common_product_data_set_single_ca(asin_list[i + j], country_name, amazon_url,
+                single_result = get_common_product_data_set_single_it(asin_list[i + j], country_name, amazon_url,
                                                                       driver)
 
                 if single_result is not None:
@@ -120,7 +110,7 @@ def get_common_product_data_set_multi_tabs_ca(asin_list, country_name, amazon_ur
     return results
 
 
-def get_common_product_data_set_single_ca(asin, country_name, amazon_url, driver):
+def get_common_product_data_set_single_it(asin, country_name, amazon_url, driver):
     # 打开商品详情链接
     product_url = f'{amazon_url}dp/{asin}'
     driver.get(product_url)
@@ -129,7 +119,7 @@ def get_common_product_data_set_single_ca(asin, country_name, amazon_url, driver
     result = None
     try:
         # 等待页面加载完成
-        WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 7).until(
             EC.presence_of_element_located((By.ID, "dp-container"))
         )
     except TimeoutException:
@@ -158,9 +148,9 @@ def get_common_product_data_set_single_ca(asin, country_name, amazon_url, driver
         unavailable_element = driver.find_element(By.ID, "availability")
 
         # if unavailable_element:
-        if "Currently unavailable" in unavailable_element.text:
+        if "Non disponibile" in unavailable_element.text:
             is_unavailable = True
-        elif "Actuellement indisponible" in unavailable_element.text:
+        elif "Currently unavailable" in unavailable_element.text:
             is_unavailable = True
 
     except NoSuchElementException:

@@ -1,16 +1,16 @@
 import logging
+import time
 import traceback
 
 from selenium.common import NoSuchElementException, TimeoutException, ElementClickInterceptedException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import time
+from selenium.webdriver.support.ui import WebDriverWait
 
-import parser_common
+import parsers.parser_common as parser_common
 
 
-def get_product_info_co_uk(asin_list, country_name, amazon_url, postal_code, driver):
+def get_product_info_com(asin_list, country_name, amazon_url, postal_code, driver):
     retries = 0
     max_retries = 3
     fail_flag = False

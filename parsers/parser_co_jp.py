@@ -1,16 +1,16 @@
 import logging
+import time
 import traceback
 
 from selenium.common import NoSuchElementException, TimeoutException, ElementClickInterceptedException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import time
+from selenium.webdriver.support.ui import WebDriverWait
 
-import parser_common
+import parsers.parser_common as parser_common
 
 
-def get_product_info_es(asin_list, country_name, amazon_url, postal_code, driver):
+def get_product_info_co_jp(asin_list, country_name, amazon_url, postal_code, driver):
     retries = 0
     max_retries = 3
     fail_flag = False
@@ -46,11 +46,19 @@ def get_product_info_es(asin_list, country_name, amazon_url, postal_code, driver
                 pass
 
             parser_common.except_screenshot(driver)
+            postal_code_split = postal_code.split("-")
+
             postal_code_input = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.ID, 'GLUXZipUpdateInput'))
+                EC.presence_of_element_located((By.ID, 'GLUXZipUpdateInput_0'))
             )
             postal_code_input.clear()
-            postal_code_input.send_keys(postal_code)
+            postal_code_input.send_keys(postal_code_split[0])
+
+            postal_code_input = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.ID, 'GLUXZipUpdateInput_1'))
+            )
+            postal_code_input.clear()
+            postal_code_input.send_keys(postal_code_split[1])
 
             # 点击 Apply
             apply_button = WebDriverWait(driver, 10).until(
@@ -79,10 +87,10 @@ def get_product_info_es(asin_list, country_name, amazon_url, postal_code, driver
     if fail_flag is True:
         return None
     else:
-        return get_common_product_data_set_multi_tabs_es(asin_list, country_name, amazon_url, driver)
+        return get_common_product_data_set_multi_tabs_co_jp(asin_list, country_name, amazon_url, driver)
 
 
-def get_common_product_data_set_multi_tabs_es(asin_list, country_name, amazon_url, driver):
+def get_common_product_data_set_multi_tabs_co_jp(asin_list, country_name, amazon_url, driver):
     # 创建结果集合
     results = []
     logging.info(f'开始循环打开 {country_name} 商品')
@@ -101,8 +109,8 @@ def get_common_product_data_set_multi_tabs_es(asin_list, country_name, amazon_ur
             if i + j < len(asin_list):
                 driver.switch_to.window(handles[j])
 
-                single_result = get_common_product_data_set_single_es(asin_list[i + j], country_name, amazon_url,
-                                                                      driver)
+                single_result = get_common_product_data_set_single_co_jp(asin_list[i + j], country_name, amazon_url,
+                                                                         driver)
 
                 if single_result is not None:
                     results.append(single_result)
@@ -110,7 +118,7 @@ def get_common_product_data_set_multi_tabs_es(asin_list, country_name, amazon_ur
     return results
 
 
-def get_common_product_data_set_single_es(asin, country_name, amazon_url, driver):
+def get_common_product_data_set_single_co_jp(asin, country_name, amazon_url, driver):
     # 打开商品详情链接
     product_url = f'{amazon_url}dp/{asin}'
     driver.get(product_url)
@@ -148,10 +156,14 @@ def get_common_product_data_set_single_es(asin, country_name, amazon_url, driver
         unavailable_element = driver.find_element(By.ID, "availability")
 
         # if unavailable_element:
-        if "Non disponibile" in unavailable_element.text:
+        if "目前无货" in unavailable_element.text:
             is_unavailable = True
         elif "Currently unavailable" in unavailable_element.text:
             is_unavailable = True
+        elif "In Stock" in unavailable_element.text:
+            is_unavailable = False
+        elif "现在有货" in unavailable_element.text:
+            is_unavailable = False
 
     except NoSuchElementException:
         # 未找到 "Currently unavailable." 元素,表示商品可在当前区域售卖
@@ -182,10 +194,11 @@ def get_common_product_data_set_single_es(asin, country_name, amazon_url, driver
             brand = brand_element.text.strip()
             # 'Brand: WindMax' -> 'WindMax'
             brand = parser_common.amazon_brand_split(brand)
+            brand = remove_specific_substrings(brand)
             # Marke: BITOM
-            # Marca: Compatibile
             # 品牌：Dalinch
-            # Marque: Laurier
+            # 访问 Dikeshgu 品牌旗舰店
+            # 品牌：「Hello*Enjoy 専門店」
 
         if rating_element is not None:
             rating = rating_element.text.strip()
@@ -226,3 +239,10 @@ def get_common_product_data_set_single_es(asin, country_name, amazon_url, driver
     time.sleep(1)
 
     return result
+
+
+def remove_specific_substrings(text):
+    substrings_to_remove = ["品牌旗舰店", "访问", "専門店", "「", "」"]
+    for substring in substrings_to_remove:
+        text = text.replace(substring, "")
+    return text.strip()

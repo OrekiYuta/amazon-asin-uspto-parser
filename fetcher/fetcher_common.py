@@ -8,7 +8,7 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 import logging
-import parser_common
+from parsers import parser_common
 
 
 def fetch_uspto_common(brand, driver, uspto_check_url):

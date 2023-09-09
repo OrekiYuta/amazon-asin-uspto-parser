@@ -41,6 +41,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    version='C:\\Users\\OREKIY~1\\AppData\\Local\\Temp\\f68be030-11b7-473f-8c57-d1dbfe73baf0',
+    version='C:\\Users\\OREKIY~1\\AppData\\Local\\Temp\\4be891f7-5a7f-4622-9486-50a4e133a000',
     icon=['assets\\amazon.png'],
 )

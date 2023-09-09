@@ -8,10 +8,10 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 import logging
-import parser_common
+from parsers import parser_common
 
 
-def fetch_uspto_co_jp(brand, driver, uspto_check_url):
+def fetch_uspto_com(brand, driver, uspto_check_url):
     is_registered_flag = False
 
     retries = 0
@@ -20,17 +20,26 @@ def fetch_uspto_co_jp(brand, driver, uspto_check_url):
         try:
             driver.get(uspto_check_url)
 
-            driver.implicitly_wait(10)
+            time.sleep(2)
+            # 进入商标查询页面
+            link_element = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, '/html/body/center/table[1]/tbody/tr[2]/td/font/font/a')
+                )
+            )
+            link_element.click()
+
+            time.sleep(2)
 
             # 输入商标
-            search_input = driver.find_element(By.ID, 's01_srchCondtn_txtSimpleSearch')
+            search_input = driver.find_element(By.XPATH, '/html/body/form/font/table[4]/tbody/tr[1]/td/input')
             search_input.clear()
             search_input.send_keys(brand)
 
             # 点击查询按钮
             search_button = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable(
-                    (By.ID, 's01_srchBtn_btnSearch')
+                    (By.XPATH, '/html/body/form/font/table[4]/tbody/tr[4]/td/input[3]')
                 )
             )
 
@@ -54,9 +63,10 @@ def fetch_uspto_co_jp(brand, driver, uspto_check_url):
         # parser_common.fake_operation_scroll(driver)
 
         # 检查页面元素,查找结果
-        flag_element = driver.find_element(By.ID, "mat-tab-label-0-2")
+        flag_element = driver.find_element(By.XPATH, "//form[@action='/bin/showfield']")
+        target_scope = flag_element.find_element(By.XPATH, './following-sibling::*[1]')
 
-        if "(0)" not in flag_element.text.strip():
+        if "Record" in target_scope.text.strip():
             is_registered_flag = True
 
     except NoSuchElementException:
@@ -65,10 +75,3 @@ def fetch_uspto_co_jp(brand, driver, uspto_check_url):
         pass
 
     return is_registered_flag
-
-if __name__ == '__main__':
-    sss = "(0)"
-    if "(0)" not in sss:
-        print(2222)
-    else:
-        print(111)

@@ -8,14 +8,15 @@ from datetime import datetime
 import chromedriver_autoinstaller
 from selenium.common import WebDriverException
 from selenium.webdriver.chrome.options import Options
-import parser_it
-import parser_co_jp
-import parser_es
-import parser_de
-import parser_com
-import parser_fr
-import parser_co_uk
-import parser_ca
+from parsers.parser_ca import get_product_info_ca
+from parsers.parser_de import get_product_info_de
+from parsers.parser_it import get_product_info_it
+from parsers.parser_fr import get_product_info_fr
+from parsers.parser_es import get_product_info_es
+from parsers.parser_co_uk import get_product_info_co_uk
+from parsers.parser_com import get_product_info_com
+from parsers.parser_co_jp import get_product_info_co_jp
+
 import config
 import uspto_search
 from selenium import webdriver
@@ -35,7 +36,9 @@ chromedriver_autoinstaller.install(cwd=True)
 chrome_options = Options()
 
 # chrome_options.add_argument('--headless')  # 无头模式,不打开浏览器窗口
+# chrome_options.add_argument("--headless=new")
 chrome_options.add_argument("start-maximized")
+chrome_options.add_argument("--window-size=1920,1080")
 chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 chrome_options.add_experimental_option('useAutomationExtension', False)
@@ -83,14 +86,14 @@ def get_postal_code(country):
 
 def get_country_product_route(country):
     country_parser = {
-        '意大利': parser_it.get_product_info_it,
-        '西班牙': parser_es.get_product_info_es,
-        '德国': parser_de.get_product_info_de,
-        '英国': parser_co_uk.get_product_info_co_uk,
-        '美国': parser_com.get_product_info_com,
-        '法国': parser_fr.get_product_info_fr,
-        '日本': parser_co_jp.get_product_info_co_jp,
-        '加拿大': parser_ca.get_product_info_ca
+        '意大利': get_product_info_it,
+        '西班牙': get_product_info_es,
+        '德国': get_product_info_de,
+        '英国': get_product_info_co_uk,
+        '美国': get_product_info_com,
+        '法国': get_product_info_fr,
+        '日本': get_product_info_co_jp,
+        '加拿大': get_product_info_ca
     }
 
     get_product_country_info = country_parser.get(country)
@@ -208,5 +211,5 @@ def pipeline():
 
 
 if __name__ == '__main__':
-    pipeline()
-    # get_uspto_info()
+    # pipeline()
+    get_uspto_info()
